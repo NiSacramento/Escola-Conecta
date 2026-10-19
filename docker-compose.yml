@@ -1,0 +1,12 @@
+services:
+  escola-conecta:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_URLS: "http://+:8080"
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ConnectionStrings__DefaultConnection: "${ConnectionStrings__DefaultConnection:?Defina ConnectionStrings__DefaultConnection no arquivo .env}"
+      Jwt__Key: "${Jwt__Key:?Defina Jwt__Key no arquivo .env}"

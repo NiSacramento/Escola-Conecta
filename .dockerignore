@@ -1,0 +1,39 @@
+﻿**/bin/
+**/obj/
+publish/
+artifacts/
+
+# IDEs
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Variaveis de ambiente e configuracoes locais
+.env
+.env.*
+!.env.example
+appsettings.json
+appsettings.Development.json
+appsettings.Staging.json
+appsettings.Production.json
+
+# Certificados e chaves
+*.pem
+*.key
+*.pfx
+*.publishsettings
+*.PublishSettings
+*.publish.xml
+
+# Pacotes locais e publicacoes
+*.zip
+publicacao-final/
+publish-azure/
+
+# Controle de versao e sistema
+.git/
+.github/
+.DS_Store
+Thumbs.db

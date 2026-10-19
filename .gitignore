@@ -1,0 +1,43 @@
+# Build outputs
+**/bin/
+**/obj/
+publish/
+artifacts/
+
+# IDEs and local state
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+appsettings.Production.json
+secrets.json
+*.publishsettings
+*.PublishSettings
+*.publish.xml
+*.pfx
+*.key
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local application settings
+appsettings.json
+appsettings.Development.json
+appsettings.Staging.json
+!appsettings.example.json
+
+# Certificates and private keys
+*.pem
+*.key
+
+# Local deployment packages
+*.zip
+publicacao-final/
+publish-azure/

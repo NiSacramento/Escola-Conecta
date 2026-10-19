@@ -1,0 +1,43 @@
+﻿name: Build and deploy Escola Conecta
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: escola-conecta-production
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restaurar dependencias
+        run: dotnet restore BackendPIM.csproj
+
+      - name: Compilar
+        run: dotnet build BackendPIM.csproj --configuration Release --no-restore
+
+      - name: Publicar aplicacao
+        run: dotnet publish BackendPIM.csproj --configuration Release --no-build --output ./publish
+
+      - name: Publicar no Azure App Service
+        if: github.event_name == 'workflow_dispatch'
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: escola-conecta-api
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./publish

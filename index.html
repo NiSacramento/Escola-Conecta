@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Escola Conecta">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Escola Conecta</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.6.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+</head>
+
+<body>
+
+<section id="authArea" class="auth-area">
+<div id="loginTela" class="auth-card">
+
+<img src="./img/logo-escola-conecta.png" class="logo-login" alt="Logo Escola Conecta">
+       <h1>Entrar</h1>
+
+  <p>Acesse sua conta para continuar.</p>
+
+    <label>Email</label>
+    <input id="loginEmail" type="email" placeholder="Digite seu email">
+
+    <label>Senha</label>
+    <input id="loginSenha" type="password" placeholder="Digite sua senha">
+
+    <button onclick="entrar()">Entrar</button>
+
+    <div class="auth-links">
+      <span onclick="mostrarAuth('cadastroTela')">Criar conta</span>
+      <span onclick="mostrarAuth('esqueciTela')">Esqueci minha senha</span>
+    </div>
+
+    <p id="loginMsg" class="mensagem"></p>
+  </div>
+
+  <div id="cadastroTela" class="auth-card hidden">
+    <h1>Cadastro</h1>
+    <p>Preencha os dados para criar sua conta.</p>
+
+    <label>Nome</label>
+    <input id="cadNome" type="text" placeholder="Digite seu nome">
+
+    <label>Data de nascimento</label>
+    <input id="cadNascimento" type="date">
+
+    <label>Email</label>
+    <input id="cadEmail" type="email" placeholder="Digite seu email">
+
+    <label>Confirmar email</label>
+    <input id="cadConfirmaEmail" type="email" placeholder="Confirme seu email">
+
+    <label>Senha</label>
+    <input id="cadSenha" type="password" placeholder="Digite sua senha">
+
+    <label>Confirmar senha</label>
+    <input id="cadConfirmaSenha" type="password" placeholder="Confirme sua senha">
+
+    <button onclick="cadastrar()">Cadastrar</button>
+
+    <div class="auth-links">
+      <span onclick="mostrarAuth('loginTela')">Voltar para login</span>
+    </div>
+
+    <p id="cadastroMsg" class="mensagem"></p>
+  </div>
+
+  <div id="esqueciTela" class="auth-card hidden">
+    <h1>Recuperar senha</h1>
+    <p>Informe seu email e cadastre uma nova senha.</p>
+
+    <label>Email cadastrado</label>
+    <input id="recEmail" type="email" placeholder="Digite seu email">
+
+    <label>Nova senha</label>
+    <input id="recSenha" type="password" placeholder="Nova senha">
+
+    <label>Confirmar nova senha</label>
+    <input id="recConfirmaSenha" type="password" placeholder="Confirme a nova senha">
+
+    <button onclick="trocarSenha()">Alterar senha</button>
+
+    <div class="auth-links">
+      <span onclick="mostrarAuth('loginTela')">Voltar para login</span>
+    </div>
+
+    <p id="recMsg" class="mensagem"></p>
+  </div>
+
+</section>
+
+<div id="sistemaArea" class="app hidden">
+
+  <aside class="sidebar">
+    <h2>Escola Conecta</h2>
+
+    <nav>
+      <button class="active" onclick="mostrarTela('inicio')">Início</button>
+      <button onclick="mostrarTela('aulas')">Aulas</button>
+      <button onclick="mostrarTela('exercicios')">Exercícios</button>
+      <button onclick="mostrarTela('progresso')">Progresso</button>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+<button class="btn-menu-mobile" onclick="abrirMenuMobile()">☰ Menu</button>
+<button class="btn-busca-mobile" onclick="alternarBuscaMobile()">🔍</button>
+<div id="overlayMenu" class="overlay-menu" onclick="fecharMenuMobile()"></div>
+
+  <header class="topbar">
+  <input
+  id="campoPesquisa"
+  type="text"
+  placeholder="Buscar no sistema..."
+  oninput="pesquisarSistema()"
+  style="
+    display:block !important;
+    width:520px !important;
+    max-width:100% !important;
+    padding:18px 22px !important;
+    border-radius:18px !important;
+    border:1px solid #e6e9f2 !important;
+    font-size:16px !important;
+    outline:none !important;
+    background:white !important;
+    position:relative !important;
+    z-index:9999 !important;
+  "
+>
+    <div class="profile">
+        <div class="avatar-container">
+  <img id="avatarImg" class="avatar-img hidden" src="" alt="Foto de perfil">
+
+  <div id="avatarPerfil" class="avatar">N</div>
+</div>
+
+        <div class="profile-name" onclick="abrirMenuPerfil()">
+  <strong id="nomePerfil">Nicole</strong>
+  <span>Minha conta ▾</span>
+</div>
+
+<div id="menuPerfil" class="menu-perfil hidden">
+  <button onclick="mostrarTela('configuracoes'); fecharMenuPerfil()">Configurações</button>
+  <button onclick="mostrarTela('progresso'); fecharMenuPerfil()">Progresso</button>
+  <button onclick="sair()">Sair</button>
+</div>
+      </div>
+    </header>
+
+    <div id="resultadoPesquisa" class="resultado-pesquisa hidden"></div>
+
+    <section id="inicio" class="tela ativa">
+      <div class="hero">
+        <h1 id="boasVindas">Bem-vindo, Nicole!</h1>
+        <p>Continue aprendendo e evoluindo.</p>
+      </div>
+
+      <h2 class="section-title">Acesso rápido</h2>
+
+      <div class="cards">
+        <div class="card" onclick="mostrarTela('aulas')">Aulas</div>
+        <div class="card" onclick="mostrarTela('exercicios')">Exercícios</div>
+        <div class="card" onclick="mostrarTela('progresso')">Progresso</div>
+      </div>
+    </section>
+
+    <section id="aulas" class="tela">
+      <button class="btn-voltar" onclick="mostrarTela('inicio')">← Voltar</button>
+
+      <h1 class="page-title">Aulas</h1>
+      <p class="page-subtitle">Escolha como deseja estudar.</p>
+
+      <div class="lesson-grid">
+        <div class="lesson-card">
+          <h3>Aula em Vídeo</h3>
+          <p>Assista aulas explicativas sobre Libras.</p>
+        </div>
+
+        <div class="lesson-card">
+           <h3>Aula Teórica</h3>
+          <p>Aprenda com textos, imagens e explicações.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="exercicios" class="tela">
+      <button class="btn-voltar" onclick="mostrarTela('inicio')">← Voltar</button>
+
+      <h1 class="page-title">Exercícios</h1>
+      <p class="page-subtitle">Escolha o tipo de atividade que deseja realizar.</p>
+
+      <div class="lesson-grid">
+        <div class="lesson-card" onclick="mostrarTela('webcamMenu')">
+          <h3>Exercícios com Webcam</h3>
+          <p>Pratique os gestos usando a câmera e receba feedback.</p>
+          <span>Começar →</span>
+        </div>
+
+        <div class="lesson-card" onclick="mostrarTela('cardsMenu')">
+          <h3>Exercícios com Cards</h3>
+          <p>Observe os gestos e escolha a resposta correta.</p>
+          <span>Acessar →</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="webcamMenu" class="tela">
+      <button class="btn-voltar" onclick="mostrarTela('exercicios')">← Voltar</button>
+
+      <h1 class="page-title">Exercícios com Webcam</h1>
+      <p class="page-subtitle">Escolha uma lição prática.</p>
+
+      <div class="lesson-grid">
+        <div class="lesson-card destaque" onclick="iniciarExercicio('UNIP')">
+          <h3>Soletrar UNIP</h3>
+          <p>Faça os gestos das letras U, N, I e P em sequência.</p>
+          <span>Iniciar lição →</span>
+        </div>
+
+        <div class="lesson-card destaque" onclick="iniciarExercicio('ALUNO')">
+          <h3>Soletrar ALUNO</h3>
+          <p>Faça os gestos das letras A, L, U, N e O em sequência.</p>
+          <span>Iniciar lição →</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="cardsMenu" class="tela">
+      <button class="btn-voltar" onclick="mostrarTela('exercicios')">← Voltar</button>
+
+      <h1 class="page-title">Exercícios com Cards</h1>
+      <p class="page-subtitle">Escolha um tipo de exercício para começar.</p>
+
+      <div class="lesson-grid">
+        <div class="lesson-card destaque" onclick="iniciarCardLetraPeloGesto()">
+          <h3>Identificar letra pelo gesto</h3>
+          <p>Veja o gesto e escolha qual letra ele representa.</p>
+          <span>Começar exercício →</span>
+        </div>
+
+        <div class="lesson-card destaque" onclick="iniciarCardGestoPelaLetra()">
+          <h3>Identificar gesto pela letra</h3>
+          <p>Veja a letra e selecione o card do gesto correto.</p>
+          <span>Começar exercício →</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        Cada exercício possui 10 perguntas. Você ganha pontos a cada acerto e seu progresso é salvo automaticamente.
+      </div>
+    </section>
+
+    <section id="cardLicao" class="tela">
+      <button class="btn-voltar" onclick="mostrarTela('cardsMenu')">← Voltar</button>
+
+      <div class="card-exercicio-header">
+        <h1 id="tituloCardExercicio" class="page-title">Exercício com Cards</h1>
+
+        <div class="card-status">
+          <span id="pontuacaoCards">Pontuação: 0</span>
+          <span id="perguntaCards">Pergunta: 1 / 10</span>
+        </div>
+      </div>
+
+      <div class="card-exercicio-box">
+        <h2 id="perguntaCardTexto">Pergunta</h2>
+
+        <div id="areaPerguntaCard"></div>
+
+        <div id="alternativasCards" class="alternativas-cards"></div>
+
+        <h3 id="feedbackCards" class="feedback-cards">Selecione a alternativa correta.</h3>
+      </div>
+    </section>
+
+    <section id="webcamLicao" class="tela">
+      <button class="btn-voltar" onclick="fecharWebcam()">← Voltar</button>
+
+      <div class="webcam-card">
+        <h2 id="tituloExercicio">Soletrar</h2>
+        <p class="instrucao">Faça o gesto da letra indicada abaixo.</p>
+
+        <div class="letra-box">
+          <span>Letra atual</span>
+          <h1 id="letra">U</h1>
+
+          <div class="referencia-gesto">
+            <img id="imgGesto" src="" alt="Gesto da letra">
+          </div>
+        </div>
+
+        <div class="contador-box">
+          Tempo: <strong id="contador">5</strong>s
+        </div>
+
+        <div id="webcam-container" class="camera-box"></div>
+
+        <h3 id="resultado">Aguardando gesto...</h3>
+
+        <p id="debugIA">Detectando...</p>
+
+        <div class="progresso-letras" id="progressoLetras"></div>
+      </div>
+    </section>
+
+    <section id="progresso" class="tela">
+      <button class="btn-voltar" onclick="mostrarTela('inicio')">← Voltar</button>
+
+      <h1 class="page-title">Progresso</h1>
+      <p class="page-subtitle">Resultado da última tentativa realizada.</p>
+
+      <div class="progress-box">
+        <h3 id="progressoTitulo">Nenhum exercício realizado</h3>
+
+        <div class="barra-progresso">
+          <div id="barraProgresso" class="barra-preenchida"></div>
+        </div>
+
+        <p id="progressoTexto">Faça um exercício para visualizar seu desempenho.</p>
+      </div>
+    </section>
+
+   <!-- CONFIGURAÇÕES -->
+<section id="configuracoes" class="tela">
+
+  <button class="btn-voltar" onclick="mostrarTela('inicio')">
+    ← Voltar
+  </button>
+
+  <h1 class="page-title">Configurações</h1>
+
+  <p class="page-subtitle">
+    Gerencie sua conta e segurança.
+  </p>
+
+  <div class="lesson-grid">
+
+    <!-- DADOS DA CONTA -->
+    <div class="lesson-card destaque"
+         onclick="mostrarTela('dadosConta')">
+
+
+      <h3>Dados da conta</h3>
+
+      <p>
+        Gerencie foto de perfil, nome, email e telefone.
+      </p>
+
+      <span>Abrir seção →</span>
+
+    </div>
+
+    <!-- SEGURANÇA -->
+    <div class="lesson-card destaque"
+         onclick="mostrarTela('segurancaConta')">
+
+
+      <h3>Segurança</h3>
+
+      <p>
+        Atualize senha e dados de recuperação.
+      </p>
+
+      <span>Abrir seção →</span>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- DADOS DA CONTA -->
+<section id="dadosConta" class="tela">
+
+  <button class="btn-voltar"
+          onclick="mostrarTela('configuracoes')">
+
+    ← Voltar
+
+  </button>
+
+  <h1 class="page-title">Dados da conta</h1>
+
+  <p class="page-subtitle">
+    Atualize suas informações pessoais.
+  </p>
+
+  <div class="config-card">
+
+<div class="foto-perfil-acoes">
+
+  <input
+    id="fotoConfig"
+    type="file"
+    accept="image/*"
+    onchange="carregarFotoPerfil(event)"
+  >
+
+  <button class="btn-remover-foto" onclick="removerFotoPerfil()">
+    Remover foto
+  </button>
+
+</div>
+
+    <label>Nome</label>
+    <input id="nomeConfig" type="text">
+
+    <label>Sobrenome</label>
+    <input id="sobrenomeConfig" type="text">
+
+    <label>Apelido</label>
+    <input id="apelidoConfig" type="text">
+
+    <label>Email</label>
+    <input id="emailConfig" type="email">
+
+    <label>Telefone</label>
+    <input id="telefoneConfig"
+           type="tel"
+           placeholder="(00) 00000-0000">
+
+    <button class="btn-salvar"
+            onclick="salvarDadosConta()">
+
+      Salvar alterações
+
+    </button>
+
+    <p id="dadosMsg"
+       class="mensagem"></p>
+
+  </div>
+
+</section>
+
+<!-- SEGURANÇA -->
+<section id="segurancaConta" class="tela">
+
+  <button class="btn-voltar"
+          onclick="mostrarTela('configuracoes')">
+
+    ← Voltar
+
+  </button>
+
+  <h1 class="page-title">Segurança</h1>
+
+  <p class="page-subtitle">
+    Atualize senha e recuperação.
+  </p>
+
+  <div class="config-card">
+
+    <label>Nova senha</label>
+    <input id="senhaConfig"
+           type="password"
+           placeholder="Digite a nova senha">
+
+    <label>Confirmar senha</label>
+    <input id="confirmaSenhaConfig"
+           type="password"
+           placeholder="Confirme a senha">
+
+    <label>Email de recuperação</label>
+    <input id="emailRecConfig"
+           type="email"
+           placeholder="recuperacao@email.com">
+
+    <label>Telefone de recuperação</label>
+    <input id="telefoneRecConfig"
+           type="tel"
+           placeholder="(00) 00000-0000">
+
+    <button class="btn-salvar"
+            onclick="salvarSeguranca()">
+
+      Atualizar segurança
+
+    </button>
+
+    <p id="segMsg"
+       class="mensagem"></p>
+
+  </div>
+
+</section>
+
+  </main>
+</div>
+<script src="script.js?v=31"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js')
+        .catch(error => console.error('Falha ao registrar o Service Worker:', error));
+    });
+  }
+</script>
+</body>
+</html>
