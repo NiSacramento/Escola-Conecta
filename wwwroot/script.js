@@ -55,7 +55,7 @@ const letrasCards = ["B", "I", "L", "N", "O", "P", "U"];
 
 let tipoCardAtual = "";
 let perguntaAtualCard = 0;
-let totalPerguntasCards = 10;
+let totalPerguntasCards = 5;
 let pontuacaoCard = 0;
 let errosCards = 0;
 let respostaCorretaCard = "";

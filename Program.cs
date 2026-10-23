@@ -62,6 +62,7 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins(
                 "https://escola-conecta-api-ayawbtb5gyhjcqdf.brazilsouth-01.azurewebsites.net",
+                "http://localhost:8080",
                 "http://localhost:5500",
                 "http://127.0.0.1:5500",
                 "http://localhost:5501",

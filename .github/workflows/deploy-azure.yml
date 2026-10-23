@@ -35,7 +35,6 @@ jobs:
         run: dotnet publish BackendPIM.csproj --configuration Release --no-build --output ./publish
 
       - name: Publicar no Azure App Service
-        if: github.event_name == 'workflow_dispatch'
         uses: azure/webapps-deploy@v3
         with:
           app-name: escola-conecta-api
