@@ -12,7 +12,9 @@ let ultimaPredicao = null;
 let totalTentativas = 0;
 let totalErros = 0;
 
-
+/**
+ * Alterna a visibilidade de um campo de senha sem alterar seu valor.
+ */
 function alternarVisibilidadeSenha(campoId, botao) {
   const campo = document.getElementById(campoId);
   if (!campo || !botao) return;
@@ -21,7 +23,7 @@ function alternarVisibilidadeSenha(campoId, botao) {
   campo.type = mostrar ? "text" : "password";
   botao.setAttribute("aria-label", mostrar ? "Ocultar senha" : "Mostrar senha");
   botao.setAttribute("aria-pressed", String(mostrar));
-  botao.textContent = mostrar ? "â—‰" : "â—Ž";
+  botao.textContent = mostrar ? "◉" : "◎";
   botao.title = mostrar ? "Ocultar senha" : "Mostrar senha";
 }
 
@@ -38,7 +40,7 @@ const API_URL = (() => {
 })();
 const confiancaMinima = 0.60;
 
-
+// Mantém o histórico local separado por usuário para não misturar dados entre contas.
 function chaveHistoricoAtual() {
   const email = usuarioLogado && usuarioLogado.email
     ? usuarioLogado.email.trim().toLowerCase()
@@ -46,7 +48,8 @@ function chaveHistoricoAtual() {
   return `historicoProgresso_${email}`;
 }
 
-
+// Esta checagem melhora a experiência do usuário; a validação real do token
+// continua sendo feita pelo backend em cada requisição protegida.
 function tokenAindaValido() {
   if (!tokenAcesso) return false;
 
@@ -83,8 +86,8 @@ async function lerResposta(response) {
 
 const itensPesquisa = [
   { nome: "Aulas", tela: "aulas" },
-  { nome: "Aula em vÃ­deo", tela: "aulas" },
-  { nome: "Aula teÃ³rica", tela: "aulas" },
+  { nome: "Aula em vídeo", tela: "aulas" },
+  { nome: "Aula teórica", tela: "aulas" },
   { nome: "Exercícios", tela: "exercicios" },
   { nome: "Exercícios com webcam", tela: "webcamMenu" },
   { nome: "Soletrar UNIP", tela: "webcamMenu" },
@@ -93,7 +96,7 @@ const itensPesquisa = [
   { nome: "Identificar letra pelo gesto", tela: "cardsMenu" },
   { nome: "Identificar gesto pela letra", tela: "cardsMenu" },
   { nome: "Progresso", tela: "progresso" },
-  { nome: "ConfiguraÃ§Ãµes", tela: "configuracoes" },
+  { nome: "Configurações", tela: "configuracoes" },
   { nome: "Dados da conta", tela: "configuracoes" },
   { nome: "Segurança", tela: "configuracoes" },
   { nome: "Alterar senha", tela: "configuracoes" }
@@ -112,7 +115,7 @@ function mostrarAuth(id) {
     if (el) el.innerText = "";
   });
 
-
+  // Limpa os campos temporários ao sair da recuperação de senha.
   if (id !== "esqueciTela") {
     ["recSenha", "recConfirmaSenha"].forEach(campoId => {
       const campo = document.getElementById(campoId);
@@ -221,7 +224,7 @@ async function entrar() {
     }
 
     if (!data.token) {
-    msg.innerText = "A API ainda não estÃ¡ configurada para fornecer o token de acesso.";
+    msg.innerText = "A API ainda não está configurada para fornecer o token de acesso.";
     msg.style.color = "red";
     return;
 }
@@ -389,13 +392,13 @@ async function salvarDadosConta() {
   const msg = document.getElementById("dadosMsg");
 
   if (!nome || !novoEmail) {
-    msg.innerText = "Nome e email sÃ£o obrigatórios.";
+    msg.innerText = "Nome e email são obrigatórios.";
     msg.style.color = "red";
     return;
   }
 
   if (!tokenAcesso) {
-    msg.innerText = "Sua sessÃ£o expirou. Entre novamente.";
+    msg.innerText = "Sua sessão expirou. Entre novamente.";
     msg.style.color = "red";
     sair();
     return;
@@ -463,7 +466,7 @@ async function salvarSeguranca() {
   }
 
   if (!tokenAcesso) {
-    msg.innerText = "Sua sessÃ£o expirou. Entre novamente.";
+    msg.innerText = "Sua sessão expirou. Entre novamente.";
     msg.style.color = "red";
     sair();
     return;
@@ -488,7 +491,7 @@ async function salvarSeguranca() {
     const data = await lerResposta(response);
 
     if (!response.ok) {
-      msg.innerText = data.mensagem || "Erro ao alterar seguranÃ§a.";
+      msg.innerText = data.mensagem || "Erro ao alterar segurança.";
       msg.style.color = "red";
       return;
     }
@@ -515,8 +518,8 @@ async function salvarSeguranca() {
 }
 
 function mostrarTela(id) {
-  // A validaÃ§Ã£o abaixo evita abrir a tela pela interface; o backend tambÃ©m
-  // exige a funÃ§Ã£o Administrador para entregar os dados.
+  // A validação abaixo evita abrir a tela pela interface; o backend também
+  // exige a função Administrador para entregar os dados.
   if (id === "adminAlunos" && !usuarioEhAdministrador()) {
     mostrarTela("inicio");
     return;
@@ -573,7 +576,7 @@ async function carregarAlunosAdmin() {
       mensagem.innerText = resposta.status === 403
         ? "Seu perfil não tem permissão para acessar esta área."
         : resposta.status === 401
-          ? "Sessão invÃ¡lida ou expirada. Entre novamente."
+          ? "Sessão inválida ou expirada. Entre novamente."
           : (dados.mensagem || "Erro ao consultar os alunos.");
       mensagem.style.color = "red";
       return;
@@ -601,8 +604,8 @@ async function carregarAlunosAdmin() {
     mensagem.style.color = "green";
   } catch (erro) {
     console.error("Erro ao carregar a área administrativa:", erro);
-    corpo.innerHTML = '<tr><td colspan="5">Falha na conexÃ£o com o servidor.</td></tr>';
-    mensagem.innerText = "Não foi possível conectar Ã  API administrativa.";
+    corpo.innerHTML = '<tr><td colspan="5">Falha na conexão com o servidor.</td></tr>';
+    mensagem.innerText = "Não foi possível conectar à API administrativa.";
     mensagem.style.color = "red";
   }
 }
@@ -641,7 +644,7 @@ async function abrirProgressoAluno(email, nome) {
         mensagem.innerText = resposta.status === 403
           ? "Seu perfil não tem permissão para consultar esse histórico."
           : resposta.status === 401
-            ? "Sessão invÃ¡lida ou expirada. Entre novamente."
+            ? "Sessão inválida ou expirada. Entre novamente."
             : (dados.mensagem || "Erro ao consultar o progresso.");
         mensagem.style.color = "red";
       }
@@ -665,7 +668,7 @@ async function abrirProgressoAluno(email, nome) {
       return `
         <tr>
           <td>${escaparHtmlAdmin(item.exercicio || "Exercício")}</td>
-          <td><span class="admin-nota">${Number.isFinite(nota) ? `${nota}%` : "â€”"}</span></td>
+          <td><span class="admin-nota">${Number.isFinite(nota) ? `${nota}%` : "—"}</span></td>
           <td>${Number.isFinite(Number(item.acertos)) ? Number(item.acertos) : 0}</td>
           <td>${Number.isFinite(Number(item.erros)) ? Number(item.erros) : 0}</td>
           <td>${escaparHtmlAdmin(item.data || "Sem data")}</td>
@@ -678,9 +681,9 @@ async function abrirProgressoAluno(email, nome) {
     }
   } catch (erro) {
     console.error("Erro ao carregar progresso do aluno:", erro);
-    if (corpo) corpo.innerHTML = '<tr><td colspan="5">Falha na conexÃ£o com o servidor.</td></tr>';
+    if (corpo) corpo.innerHTML = '<tr><td colspan="5">Falha na conexão com o servidor.</td></tr>';
     if (mensagem) {
-      mensagem.innerText = "Não foi possível conectar Ã  API para consultar o progresso.";
+      mensagem.innerText = "Não foi possível conectar à API para consultar o progresso.";
       mensagem.style.color = "red";
     }
   }
@@ -765,7 +768,13 @@ async function iniciarWebcam() {
     if (contadorBox) contadorBox.style.display = "block";
 
     document.getElementById("resultado").innerText = "Aguardando gesto...";
-    document.getElementById("debugIA").innerText = "Detectando...";
+    const indicadorInicialIA = document.getElementById("debugIA");
+    if (indicadorInicialIA) {
+      indicadorInicialIA.innerText = "Detectando...";
+      indicadorInicialIA.style.display = "block";
+      indicadorInicialIA.style.visibility = "visible";
+      indicadorInicialIA.style.opacity = "1";
+    }
     document.getElementById("progressoLetras").innerText = "";
 
     atualizarLetra();
@@ -799,8 +808,27 @@ async function loop() {
   const classe = normalizarClasse(maior.className);
   const porcentagem = (maior.probability * 100).toFixed(1);
 
-  document.getElementById("debugIA").innerText =
-    "Detectando: " + classe + " - " + porcentagem + "%";
+  // Exibe novamente a confiança da IA durante a detecção, inclusive em telas móveis.
+  let indicadorIA = document.getElementById("debugIA");
+  if (!indicadorIA) {
+    indicadorIA = document.createElement("p");
+    indicadorIA.id = "debugIA";
+    const areaCamera = document.getElementById("webcam-container");
+    if (areaCamera && areaCamera.parentElement) {
+      areaCamera.insertAdjacentElement("afterend", indicadorIA);
+    }
+  }
+
+  if (indicadorIA) {
+    indicadorIA.textContent = `Detectando: ${classe} - ${porcentagem}%`;
+    indicadorIA.style.display = "block";
+    indicadorIA.style.visibility = "visible";
+    indicadorIA.style.opacity = "1";
+    indicadorIA.style.marginTop = "10px";
+    indicadorIA.style.fontSize = "14px";
+    indicadorIA.style.fontWeight = "600";
+    indicadorIA.style.color = "#526078";
+  }
 
   window.requestAnimationFrame(loop);
 }
@@ -850,7 +878,7 @@ function validarAoFinal() {
 function acerto() {
   const resultado = document.getElementById("resultado");
 
-  resultado.innerText = "âœ” Correto!";
+  resultado.innerText = "✔ Correto!";
   resultado.style.color = "green";
   resultado.classList.add("pulse");
 
@@ -871,7 +899,7 @@ function acerto() {
 function erro() {
   const resultado = document.getElementById("resultado");
 
-  resultado.innerText = "âŒ Gesto errado, tente novamente.";
+  resultado.innerText = "❌ Gesto errado, tente novamente.";
   resultado.style.color = "red";
   resultado.classList.add("pulse");
 
@@ -905,10 +933,10 @@ function atualizarLetra() {
 
   document.getElementById("progressoLetras").innerText =
     letras.map((letra, i) => {
-      if (i < index) return "âœ” " + letra;
-      if (i === index) return "ðŸ‘‰ " + letra;
+      if (i < index) return "✔ " + letra;
+      if (i === index) return "👉 " + letra;
       return letra;
-    }).join("  â€¢  ");
+    }).join("  •  ");
 }
 
 function finalizarExercicio() {
@@ -941,7 +969,7 @@ function finalizarExercicio() {
       <p>Você concluiu ${palavraAtual} com ${totalErros} erro(s).</p>
     </div>
 <button class="btn-voltar-final" onclick="mostrarTela('inicio')">
-  Voltar ao inÃ­cio
+  Voltar ao início
 </button>
   `;
 
@@ -1043,7 +1071,7 @@ function gerarPerguntaGestoPelaLetra() {
   atualizarStatusCards();
 
   document.getElementById("perguntaCardTexto").innerText =
-    "Qual gesto corresponde Ã  letra abaixo?";
+    "Qual gesto corresponde à letra abaixo?";
 
   document.getElementById("areaPerguntaCard").innerHTML = `
     <div class="letra-pergunta-card">${respostaCorretaCard}</div>
@@ -1071,13 +1099,13 @@ function responderCard(resposta) {
   if (resposta === respostaCorretaCard) {
     pontuacaoCard += 10;
 
-    document.getElementById("feedbackCards").innerText = "âœ” Correto!";
+    document.getElementById("feedbackCards").innerText = "✔ Correto!";
     document.getElementById("feedbackCards").style.color = "green";
   } else {
     errosCards++;
 
     document.getElementById("feedbackCards").innerText =
-      "âŒ Resposta errada, tente prestar atenção no próximo gesto.";
+      "❌ Resposta errada, tente prestar atenção no próximo gesto.";
 
     document.getElementById("feedbackCards").style.color = "red";
   }
@@ -1121,7 +1149,7 @@ function finalizarCards() {
 
 document.getElementById("alternativasCards").innerHTML = `
     <button class="btn-voltar-final" onclick="mostrarTela('inicio')">
-      Voltar ao inÃ­cio
+      Voltar ao início
     </button>
   `;
 
@@ -1140,7 +1168,7 @@ async function carregarProgresso() {
 
   if (!titulo || !barra || !texto) return;
 
-  // MantÃ©m o histórico local separado por usuÃ¡rio como alternativa.
+  // Mantém o histórico local separado por usuário como alternativa.
   const chaveHistorico = chaveHistoricoAtual();
   let historico =
     JSON.parse(localStorage.getItem(chaveHistorico)) || [];
@@ -1192,7 +1220,7 @@ async function carregarProgresso() {
         erro
       );
 
-      // Se a API falhar, mantÃ©m o histórico local disponÃ­vel
+      // Se a API falhar, mantém o histórico local disponível
     }
   }
 
