@@ -3,12 +3,13 @@ using EscolaConecta.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace EscolaConecta.Services;
 
 /// <summary>
-/// Redefinição direta de senha usada somente em demonstração local.
-/// Não exige confirmação por e-mail, portanto não deve ser habilitada em produção.
+/// Redefinição direta de senha usada somente em demonstração.
+/// Não exige confirmação por e-mail; habilite em produção apenas para testes controlados.
 /// </summary>
 public sealed class RecuperarSenhaService
 {
@@ -17,25 +18,30 @@ public sealed class RecuperarSenhaService
     private readonly EscolaConectaRepository _repositorio;
     private readonly IPasswordHasher<string> _passwordHasher;
     private readonly IWebHostEnvironment _environment;
+    private readonly IConfiguration _configuration;
 
     public RecuperarSenhaService(
         EscolaConectaRepository repositorio,
         IPasswordHasher<string> passwordHasher,
-        IWebHostEnvironment environment)
+        IWebHostEnvironment environment,
+        IConfiguration configuration)
     {
         _repositorio = repositorio;
         _passwordHasher = passwordHasher;
         _environment = environment;
+        _configuration = configuration;
     }
 
     public async Task<IResult> RedefinirAsync(RecuperarSenha solicitacao)
     {
-        // Protege contra uso remoto: o fluxo sem validação só opera localmente em Development.
-        if (!_environment.IsDevelopment())
+        // Por padrão, só permite redefinição direta localmente.
+        // No Azure, exige habilitação explícita por variável de configuração.
+        if (!_environment.IsDevelopment() &&
+            !_configuration.GetValue<bool>("RecuperacaoSenha:PermitirRedefinicaoDireta"))
         {
             return Results.Json(new
             {
-                mensagem = "A redefinição direta está disponível apenas no modo de demonstração local."
+                mensagem = "A redefinição direta está desabilitada neste ambiente."
             }, statusCode: StatusCodes.Status503ServiceUnavailable);
         }
 
