@@ -51,6 +51,11 @@ public static class ApiEndpoints
             (AdministracaoService servico) => servico.ListarAlunosAsync())
             .RequireAuthorization("SomenteAdministrador");
 
+        endpoints.MapGet("/admin/alunos/{email}/progresso",
+            (string email, AdministracaoService servico) =>
+                servico.DetalhesProgressoAlunoAsync(email))
+            .RequireAuthorization("SomenteAdministrador");
+
         return endpoints;
     }
 }

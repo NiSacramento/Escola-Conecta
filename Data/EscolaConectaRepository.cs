@@ -334,6 +334,38 @@ public sealed class EscolaConectaRepository
     }
 
 
+    public async Task<List<ProgressoResposta>> ListarProgressoAdministracaoAsync(string emailNormalizado)
+    {
+        await using var con = CriarConexao();
+        await con.OpenAsync();
+
+        await using var cmd = new SqlCommand(@"
+            SELECT Id, AlunoEmail, Exercicio, Porcentagem, Acertos, Erros, DataRegistro
+            FROM dbo.Progresso
+            WHERE LOWER(LTRIM(RTRIM(AlunoEmail))) = @Email
+            ORDER BY DataRegistro DESC, Id DESC
+        ", con);
+        cmd.Parameters.Add("@Email", SqlDbType.VarChar, 150).Value = NormalizarEmail(emailNormalizado);
+
+        await using var reader = await cmd.ExecuteReaderAsync();
+        var historico = new List<ProgressoResposta>();
+
+        while (await reader.ReadAsync())
+        {
+            historico.Add(new ProgressoResposta(
+                Id: reader.GetInt32(0),
+                AlunoEmail: reader.IsDBNull(1) ? "" : reader.GetString(1),
+                Exercicio: reader.IsDBNull(2) ? "" : reader.GetString(2),
+                Porcentagem: reader.GetInt32(3),
+                Acertos: reader.GetInt32(4),
+                Erros: reader.GetInt32(5),
+                Data: reader.GetDateTime(6).ToString("dd/MM/yyyy HH:mm")
+            ));
+        }
+
+        return historico;
+    }
+
     public async Task<bool> CriarCodigoRecuperacaoSenhaAsync(
         int alunoId,
         byte[] codigoHash,

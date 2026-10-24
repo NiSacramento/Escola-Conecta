@@ -11,8 +11,7 @@ const string JwtAudience = "EscolaConecta";
 
 var builder = WebApplication.CreateBuilder(args);
 
-// A chave JWT deve ficar em User Secrets durante o desenvolvimento e em
-// App Service > Configuration no Azure com o nome Jwt__Key.
+
 var jwtKey = builder.Configuration["Jwt:Key"];
 if (string.IsNullOrWhiteSpace(jwtKey) || Encoding.UTF8.GetByteCount(jwtKey) < 32)
 {

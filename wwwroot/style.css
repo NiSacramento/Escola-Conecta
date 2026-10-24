@@ -1744,3 +1744,53 @@ input, button, textarea, select { max-width: 100%; }
     visibility: hidden !important;
   }
 }
+
+
+/* Mostrar/ocultar senha nos formulários */
+.campo-senha-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.campo-senha-wrapper input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding-right: 54px !important;
+}
+
+.auth-card .campo-senha-wrapper input {
+  width: 100%;
+}
+
+.btn-ver-senha,
+.auth-card .btn-ver-senha,
+.config-card .btn-ver-senha {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  padding: 8px 10px;
+  min-width: 38px;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  box-shadow: none;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.btn-ver-senha:hover,
+.auth-card .btn-ver-senha:hover,
+.config-card .btn-ver-senha:hover {
+  background: var(--azul-claro);
+  color: var(--azul);
+  transform: translateY(-50%);
+}

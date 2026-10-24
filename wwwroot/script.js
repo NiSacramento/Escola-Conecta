@@ -13,6 +13,20 @@ let totalTentativas = 0;
 let totalErros = 0;
 
 
+function alternarVisibilidadeSenha(campoId, botao) {
+  const campo = document.getElementById(campoId);
+  if (!campo || !botao) return;
+
+  const mostrar = campo.type === "password";
+  campo.type = mostrar ? "text" : "password";
+  botao.setAttribute("aria-label", mostrar ? "Ocultar senha" : "Mostrar senha");
+  botao.setAttribute("aria-pressed", String(mostrar));
+  botao.textContent = mostrar ? "â—‰" : "â—Ž";
+  botao.title = mostrar ? "Ocultar senha" : "Mostrar senha";
+}
+
+
+
 const API_URL = (() => {
   // No Azure, a API e o site usam a mesma origem.
   // Localmente, o Live Server (5500/5501) chama a API ASP.NET na porta 5161.
@@ -24,7 +38,7 @@ const API_URL = (() => {
 })();
 const confiancaMinima = 0.60;
 
-// Mantém o histórico local separado por usuário para não misturar dados entre contas.
+
 function chaveHistoricoAtual() {
   const email = usuarioLogado && usuarioLogado.email
     ? usuarioLogado.email.trim().toLowerCase()
@@ -32,8 +46,7 @@ function chaveHistoricoAtual() {
   return `historicoProgresso_${email}`;
 }
 
-// Esta checagem melhora a experiência do usuário; a validação real do token
-// continua sendo feita pelo backend em cada requisição protegida.
+
 function tokenAindaValido() {
   if (!tokenAcesso) return false;
 
@@ -70,19 +83,19 @@ async function lerResposta(response) {
 
 const itensPesquisa = [
   { nome: "Aulas", tela: "aulas" },
-  { nome: "Aula em vídeo", tela: "aulas" },
-  { nome: "Aula teórica", tela: "aulas" },
-  { nome: "Exercícios", tela: "exercicios" },
-  { nome: "Exercícios com webcam", tela: "webcamMenu" },
+  { nome: "Aula em vÃ­deo", tela: "aulas" },
+  { nome: "Aula teÃ³rica", tela: "aulas" },
+  { nome: "ExercÃ­cios", tela: "exercicios" },
+  { nome: "ExercÃ­cios com webcam", tela: "webcamMenu" },
   { nome: "Soletrar UNIP", tela: "webcamMenu" },
   { nome: "Soletrar ALUNO", tela: "webcamMenu" },
-  { nome: "Exercícios com cards", tela: "cardsMenu" },
+  { nome: "ExercÃ­cios com cards", tela: "cardsMenu" },
   { nome: "Identificar letra pelo gesto", tela: "cardsMenu" },
   { nome: "Identificar gesto pela letra", tela: "cardsMenu" },
   { nome: "Progresso", tela: "progresso" },
-  { nome: "Configurações", tela: "configuracoes" },
+  { nome: "ConfiguraÃ§Ãµes", tela: "configuracoes" },
   { nome: "Dados da conta", tela: "configuracoes" },
-  { nome: "Segurança", tela: "configuracoes" },
+  { nome: "SeguranÃ§a", tela: "configuracoes" },
   { nome: "Alterar senha", tela: "configuracoes" }
 ];
 
@@ -99,7 +112,7 @@ function mostrarAuth(id) {
     if (el) el.innerText = "";
   });
 
-  // Limpa os campos temporários ao sair da recuperação de senha.
+
   if (id !== "esqueciTela") {
     ["recSenha", "recConfirmaSenha"].forEach(campoId => {
       const campo = document.getElementById(campoId);
@@ -126,13 +139,13 @@ async function cadastrar() {
   }
 
   if (email !== confirmaEmail) {
-    msg.innerText = "Os emails não conferem.";
+    msg.innerText = "Os emails nÃ£o conferem.";
     msg.style.color = "red";
     return;
   }
 
   if (senha !== confirmaSenha) {
-    msg.innerText = "As senhas não conferem.";
+    msg.innerText = "As senhas nÃ£o conferem.";
     msg.style.color = "red";
     return;
   }
@@ -208,7 +221,7 @@ async function entrar() {
     }
 
     if (!data.token) {
-    msg.innerText = "A API ainda não está configurada para fornecer o token de acesso.";
+    msg.innerText = "A API ainda nÃ£o estÃ¡ configurada para fornecer o token de acesso.";
     msg.style.color = "red";
     return;
 }
@@ -246,7 +259,7 @@ async function trocarSenha() {
   const msg = document.getElementById("recMsg");
 
   if (!email || !campoEmail.checkValidity() || !senha || !confirmaSenha) {
-    msg.innerText = "Informe um e-mail válido e preencha os dois campos de senha.";
+    msg.innerText = "Informe um e-mail vÃ¡lido e preencha os dois campos de senha.";
     msg.style.color = "red";
     return;
   }
@@ -258,13 +271,13 @@ async function trocarSenha() {
   }
 
   if (senha.length > 128) {
-    msg.innerText = "A nova senha deve ter no máximo 128 caracteres.";
+    msg.innerText = "A nova senha deve ter no mÃ¡ximo 128 caracteres.";
     msg.style.color = "red";
     return;
   }
 
   if (senha !== confirmaSenha) {
-    msg.innerText = "As senhas não conferem.";
+    msg.innerText = "As senhas nÃ£o conferem.";
     msg.style.color = "red";
     return;
   }
@@ -278,7 +291,7 @@ async function trocarSenha() {
     const data = await lerResposta(response);
 
     if (!response.ok) {
-      msg.innerText = data.mensagem || "Não foi possível alterar a senha.";
+      msg.innerText = data.mensagem || "NÃ£o foi possÃ­vel alterar a senha.";
       msg.style.color = "red";
       return;
     }
@@ -376,13 +389,13 @@ async function salvarDadosConta() {
   const msg = document.getElementById("dadosMsg");
 
   if (!nome || !novoEmail) {
-    msg.innerText = "Nome e email são obrigatórios.";
+    msg.innerText = "Nome e email sÃ£o obrigatÃ³rios.";
     msg.style.color = "red";
     return;
   }
 
   if (!tokenAcesso) {
-    msg.innerText = "Sua sessão expirou. Entre novamente.";
+    msg.innerText = "Sua sessÃ£o expirou. Entre novamente.";
     msg.style.color = "red";
     sair();
     return;
@@ -443,14 +456,14 @@ async function salvarSeguranca() {
 
   if (senha || confirmaSenha) {
     if (senha !== confirmaSenha) {
-      msg.innerText = "As senhas não conferem.";
+      msg.innerText = "As senhas nÃ£o conferem.";
       msg.style.color = "red";
       return;
     }
   }
 
   if (!tokenAcesso) {
-    msg.innerText = "Sua sessão expirou. Entre novamente.";
+    msg.innerText = "Sua sessÃ£o expirou. Entre novamente.";
     msg.style.color = "red";
     sair();
     return;
@@ -475,7 +488,7 @@ async function salvarSeguranca() {
     const data = await lerResposta(response);
 
     if (!response.ok) {
-      msg.innerText = data.mensagem || "Erro ao alterar segurança.";
+      msg.innerText = data.mensagem || "Erro ao alterar seguranÃ§a.";
       msg.style.color = "red";
       return;
     }
@@ -491,7 +504,7 @@ async function salvarSeguranca() {
     document.getElementById("senhaConfig").value = "";
     document.getElementById("confirmaSenhaConfig").value = "";
 
-    msg.innerText = data.mensagem || "Segurança alterada com sucesso!";
+    msg.innerText = data.mensagem || "SeguranÃ§a alterada com sucesso!";
     msg.style.color = "green";
 
   } catch (erro) {
@@ -502,8 +515,8 @@ async function salvarSeguranca() {
 }
 
 function mostrarTela(id) {
-  // A validação abaixo evita abrir a tela pela interface; o backend também
-  // exige a função Administrador para entregar os dados.
+  // A validaÃ§Ã£o abaixo evita abrir a tela pela interface; o backend tambÃ©m
+  // exige a funÃ§Ã£o Administrador para entregar os dados.
   if (id === "adminAlunos" && !usuarioEhAdministrador()) {
     mostrarTela("inicio");
     return;
@@ -556,11 +569,11 @@ async function carregarAlunosAdmin() {
 
     const dados = await lerResposta(resposta);
     if (!resposta.ok) {
-      corpo.innerHTML = '<tr><td colspan="5">Não foi possível carregar a lista.</td></tr>';
+      corpo.innerHTML = '<tr><td colspan="5">NÃ£o foi possÃ­vel carregar a lista.</td></tr>';
       mensagem.innerText = resposta.status === 403
-        ? "Seu perfil não tem permissão para acessar esta área."
+        ? "Seu perfil nÃ£o tem permissÃ£o para acessar esta Ã¡rea."
         : resposta.status === 401
-          ? "Sessão inválida ou expirada. Entre novamente."
+          ? "SessÃ£o invÃ¡lida ou expirada. Entre novamente."
           : (dados.mensagem || "Erro ao consultar os alunos.");
       mensagem.style.color = "red";
       return;
@@ -575,7 +588,7 @@ async function carregarAlunosAdmin() {
     } else {
       corpo.innerHTML = dados.map(aluno => `
         <tr>
-          <td>${escaparHtmlAdmin(aluno.nome)}</td>
+          <td><button type="button" class="admin-aluno-link" data-email="${escaparHtmlAdmin(aluno.email)}" data-nome="${escaparHtmlAdmin(aluno.nome)}" onclick="abrirProgressoAluno(this.dataset.email, this.dataset.nome)" aria-label="Ver progresso de ${escaparHtmlAdmin(aluno.nome)}">${escaparHtmlAdmin(aluno.nome)}</button></td>
           <td>${escaparHtmlAdmin(aluno.email)}</td>
           <td>${escaparHtmlAdmin(aluno.perfil || "Aluno")}</td>
           <td>${Number.isFinite(Number(aluno.quantidadeRegistrosProgresso)) ? Number(aluno.quantidadeRegistrosProgresso) : 0}</td>
@@ -587,10 +600,89 @@ async function carregarAlunosAdmin() {
     mensagem.innerText = `Alunos encontrados: ${dados.length}.`;
     mensagem.style.color = "green";
   } catch (erro) {
-    console.error("Erro ao carregar a área administrativa:", erro);
-    corpo.innerHTML = '<tr><td colspan="5">Falha na conexão com o servidor.</td></tr>';
-    mensagem.innerText = "Não foi possível conectar à API administrativa.";
+    console.error("Erro ao carregar a Ã¡rea administrativa:", erro);
+    corpo.innerHTML = '<tr><td colspan="5">Falha na conexÃ£o com o servidor.</td></tr>';
+    mensagem.innerText = "NÃ£o foi possÃ­vel conectar Ã  API administrativa.";
     mensagem.style.color = "red";
+  }
+}
+
+async function abrirProgressoAluno(email, nome) {
+  const mensagem = document.getElementById("adminDetalhesMsg");
+  const subtitulo = document.getElementById("adminDetalhesSubtitulo");
+  const corpo = document.getElementById("adminProgressoTbody");
+
+  if (!usuarioEhAdministrador() || !tokenAcesso) {
+    if (mensagem) {
+      mensagem.innerText = "Acesso restrito ao administrador.";
+      mensagem.style.color = "red";
+    }
+    return;
+  }
+
+  if (subtitulo) subtitulo.innerText = `HistÃ³rico de exercÃ­cios de ${nome} (${email})`;
+  if (mensagem) {
+    mensagem.innerText = "Carregando histÃ³rico...";
+    mensagem.style.color = "var(--muted)";
+  }
+  if (corpo) corpo.innerHTML = '<tr><td colspan="5">Carregando...</td></tr>';
+  mostrarTela("adminAlunoDetalhes");
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/admin/alunos/${encodeURIComponent(email)}/progresso`,
+      { headers: { "Authorization": `Bearer ${tokenAcesso}` } }
+    );
+    const dados = await lerResposta(resposta);
+
+    if (!resposta.ok) {
+      if (corpo) corpo.innerHTML = '<tr><td colspan="5">NÃ£o foi possÃ­vel carregar o histÃ³rico.</td></tr>';
+      if (mensagem) {
+        mensagem.innerText = resposta.status === 403
+          ? "Seu perfil nÃ£o tem permissÃ£o para consultar esse histÃ³rico."
+          : resposta.status === 401
+            ? "SessÃ£o invÃ¡lida ou expirada. Entre novamente."
+            : (dados.mensagem || "Erro ao consultar o progresso.");
+        mensagem.style.color = "red";
+      }
+      return;
+    }
+
+    const historico = Array.isArray(dados.historico) ? dados.historico : [];
+    if (!corpo) return;
+
+    if (historico.length === 0) {
+      corpo.innerHTML = '<tr><td colspan="5">Este aluno ainda nÃ£o possui exercÃ­cios registrados.</td></tr>';
+      if (mensagem) {
+        mensagem.innerText = "Nenhum exercÃ­cio encontrado.";
+        mensagem.style.color = "var(--muted)";
+      }
+      return;
+    }
+
+    corpo.innerHTML = historico.map(item => {
+      const nota = Number(item.porcentagem);
+      return `
+        <tr>
+          <td>${escaparHtmlAdmin(item.exercicio || "ExercÃ­cio")}</td>
+          <td><span class="admin-nota">${Number.isFinite(nota) ? `${nota}%` : "â€”"}</span></td>
+          <td>${Number.isFinite(Number(item.acertos)) ? Number(item.acertos) : 0}</td>
+          <td>${Number.isFinite(Number(item.erros)) ? Number(item.erros) : 0}</td>
+          <td>${escaparHtmlAdmin(item.data || "Sem data")}</td>
+        </tr>`;
+    }).join("");
+
+    if (mensagem) {
+      mensagem.innerText = `${historico.length} registro(s) de exercÃ­cio encontrado(s).`;
+      mensagem.style.color = "green";
+    }
+  } catch (erro) {
+    console.error("Erro ao carregar progresso do aluno:", erro);
+    if (corpo) corpo.innerHTML = '<tr><td colspan="5">Falha na conexÃ£o com o servidor.</td></tr>';
+    if (mensagem) {
+      mensagem.innerText = "NÃ£o foi possÃ­vel conectar Ã  API para consultar o progresso.";
+      mensagem.style.color = "red";
+    }
   }
 }
 
@@ -758,7 +850,7 @@ function validarAoFinal() {
 function acerto() {
   const resultado = document.getElementById("resultado");
 
-  resultado.innerText = "✔ Correto!";
+  resultado.innerText = "âœ” Correto!";
   resultado.style.color = "green";
   resultado.classList.add("pulse");
 
@@ -779,7 +871,7 @@ function acerto() {
 function erro() {
   const resultado = document.getElementById("resultado");
 
-  resultado.innerText = "❌ Gesto errado, tente novamente.";
+  resultado.innerText = "âŒ Gesto errado, tente novamente.";
   resultado.style.color = "red";
   resultado.classList.add("pulse");
 
@@ -802,7 +894,7 @@ function atualizarLetra() {
     imgGesto.alt = `Gesto da letra ${letraAtual}`;
 
     imgGesto.onerror = () => {
-      console.log("Imagem não encontrada:", imgGesto.src);
+      console.log("Imagem nÃ£o encontrada:", imgGesto.src);
     };
   }
 
@@ -813,10 +905,10 @@ function atualizarLetra() {
 
   document.getElementById("progressoLetras").innerText =
     letras.map((letra, i) => {
-      if (i < index) return "✔ " + letra;
-      if (i === index) return "👉 " + letra;
+      if (i < index) return "âœ” " + letra;
+      if (i === index) return "ðŸ‘‰ " + letra;
       return letra;
-    }).join("  •  ");
+    }).join("  â€¢  ");
 }
 
 function finalizarExercicio() {
@@ -833,7 +925,7 @@ function finalizarExercicio() {
 
   salvarProgresso(palavraAtual, porcentagem, acertos, totalErros);
 
-  document.getElementById("tituloExercicio").innerText = "Exercício finalizado!";
+  document.getElementById("tituloExercicio").innerText = "ExercÃ­cio finalizado!";
 
   const letraBox = document.querySelector(".letra-box");
   const contadorBox = document.querySelector(".contador-box");
@@ -846,10 +938,10 @@ function finalizarExercicio() {
   document.getElementById("resultado").innerHTML = `
     <div class="resultado-final-card">
       <h2>${porcentagem}%</h2>
-      <p>Você concluiu ${palavraAtual} com ${totalErros} erro(s).</p>
+      <p>VocÃª concluiu ${palavraAtual} com ${totalErros} erro(s).</p>
     </div>
 <button class="btn-voltar-final" onclick="mostrarTela('inicio')">
-  Voltar ao início
+  Voltar ao inÃ­cio
 </button>
   `;
 
@@ -858,7 +950,7 @@ function finalizarExercicio() {
 
   document.getElementById("progressoLetras").innerText = "";
 }
-/* EXERCÍCIOS COM CARDS */
+/* EXERCÃCIOS COM CARDS */
 
 function embaralhar(lista) {
   return [...lista].sort(() => Math.random() - 0.5);
@@ -910,7 +1002,7 @@ function iniciarCardGestoPelaLetra() {
 
 function atualizarStatusCards() {
   document.getElementById("pontuacaoCards").innerText =
-    "Pontuação: " + pontuacaoCard;
+    "PontuaÃ§Ã£o: " + pontuacaoCard;
 
   document.getElementById("perguntaCards").innerText =
     "Pergunta: " + perguntaAtualCard + " / " + totalPerguntasCards;
@@ -951,7 +1043,7 @@ function gerarPerguntaGestoPelaLetra() {
   atualizarStatusCards();
 
   document.getElementById("perguntaCardTexto").innerText =
-    "Qual gesto corresponde à letra abaixo?";
+    "Qual gesto corresponde Ã  letra abaixo?";
 
   document.getElementById("areaPerguntaCard").innerHTML = `
     <div class="letra-pergunta-card">${respostaCorretaCard}</div>
@@ -979,13 +1071,13 @@ function responderCard(resposta) {
   if (resposta === respostaCorretaCard) {
     pontuacaoCard += 10;
 
-    document.getElementById("feedbackCards").innerText = "✔ Correto!";
+    document.getElementById("feedbackCards").innerText = "âœ” Correto!";
     document.getElementById("feedbackCards").style.color = "green";
   } else {
     errosCards++;
 
     document.getElementById("feedbackCards").innerText =
-      "❌ Resposta errada, tente prestar atenção no próximo gesto.";
+      "âŒ Resposta errada, tente prestar atenÃ§Ã£o no prÃ³ximo gesto.";
 
     document.getElementById("feedbackCards").style.color = "red";
   }
@@ -1018,18 +1110,18 @@ function finalizarCards() {
   salvarProgresso(nomeExercicio, porcentagem, acertos, errosCards);
 
   document.getElementById("perguntaCardTexto").innerText =
-    "Exercício finalizado!";
+    "ExercÃ­cio finalizado!";
 
   document.getElementById("areaPerguntaCard").innerHTML = `
     <div class="resultado-final-card">
       <h2>${porcentagem}%</h2>
-      <p>Você fez ${acertos} acertos de ${totalPerguntasCards} perguntas.</p>
+      <p>VocÃª fez ${acertos} acertos de ${totalPerguntasCards} perguntas.</p>
     </div>
   `;
 
 document.getElementById("alternativasCards").innerHTML = `
     <button class="btn-voltar-final" onclick="mostrarTela('inicio')">
-      Voltar ao início
+      Voltar ao inÃ­cio
     </button>
   `;
 
@@ -1048,12 +1140,12 @@ async function carregarProgresso() {
 
   if (!titulo || !barra || !texto) return;
 
-  // Mantém o histórico local separado por usuário como alternativa.
+  // MantÃ©m o histÃ³rico local separado por usuÃ¡rio como alternativa.
   const chaveHistorico = chaveHistoricoAtual();
   let historico =
     JSON.parse(localStorage.getItem(chaveHistorico)) || [];
 
-  // Busca o histórico do aluno no banco de dados
+  // Busca o histÃ³rico do aluno no banco de dados
   if (usuarioLogado && usuarioLogado.email && tokenAcesso) {
     try {
       const email = encodeURIComponent(usuarioLogado.email);
@@ -1082,51 +1174,51 @@ async function carregarProgresso() {
         data: item.data
       }));
 
-      // Atualiza o histórico local com os dados do banco
+      // Atualiza o histÃ³rico local com os dados do banco
       localStorage.setItem(
         chaveHistorico,
         JSON.stringify(historico)
       );
 
       console.log(
-        "Histórico carregado do banco:",
+        "HistÃ³rico carregado do banco:",
         historico.length,
         "registro(s)."
       );
 
     } catch (erro) {
       console.error(
-        "Erro ao carregar histórico do banco:",
+        "Erro ao carregar histÃ³rico do banco:",
         erro
       );
 
-      // Se a API falhar, mantém o histórico local disponível
+      // Se a API falhar, mantÃ©m o histÃ³rico local disponÃ­vel
     }
   }
 
   if (historico.length === 0) {
-    titulo.innerText = "Nenhum exercício realizado ainda.";
+    titulo.innerText = "Nenhum exercÃ­cio realizado ainda.";
     barra.style.width = "0%";
     texto.innerHTML =
-      "Seu histórico aparecerá aqui após concluir um exercício.";
+      "Seu histÃ³rico aparecerÃ¡ aqui apÃ³s concluir um exercÃ­cio.";
     return;
   }
 
   const ultimo = historico[0];
 
-  titulo.innerText = "Último exercício: " + ultimo.exercicio;
+  titulo.innerText = "Ãšltimo exercÃ­cio: " + ultimo.exercicio;
   barra.style.width =
     Math.max(0, Math.min(100, ultimo.porcentagem)) + "%";
 
   texto.innerHTML = `
-    <strong>Último desempenho:</strong><br>
+    <strong>Ãšltimo desempenho:</strong><br>
     ${ultimo.porcentagem}% |
     Acertos: ${ultimo.acertos} |
     Erros: ${ultimo.erros} |
     ${ultimo.data || ""}
 
     <br><br>
-    <strong>Histórico completo:</strong><br><br>
+    <strong>HistÃ³rico completo:</strong><br><br>
 
     ${historico.map((item, index) => `
       <div style="margin-bottom: 12px;">
@@ -1140,7 +1232,7 @@ async function carregarProgresso() {
   `;
 }
 
-/* PROGRESSO COM HISTÓRICO COMPLETO */
+/* PROGRESSO COM HISTÃ“RICO COMPLETO */
 
 async function salvarProgresso(exercicio, porcentagem, acertos, erros) {
   const novoProgresso = {

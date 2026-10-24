@@ -11,10 +11,15 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <title>Escola Conecta</title>
 
-  <link rel="stylesheet" href="style.css?v=34">
+  <link rel="stylesheet" href="style.css?v=36">
 
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.6.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+  <style>
+    .admin-aluno-link { border: 0; padding: 0; background: transparent; color: #1d4ed8; font: inherit; text-align: left; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    .admin-aluno-link:hover, .admin-aluno-link:focus-visible { color: #1e40af; outline-offset: 3px; }
+    .admin-nota { display: inline-block; min-width: 3.5rem; padding: .25rem .5rem; border-radius: 999px; background: #e8efff; color: #173b8a; font-weight: 600; text-align: center; }
+  </style>
 </head>
 
 <body>
@@ -31,7 +36,10 @@
     <input id="loginEmail" type="email" placeholder="Digite seu email">
 
     <label>Senha</label>
-    <input id="loginSenha" type="password" placeholder="Digite sua senha">
+    <div class="campo-senha-wrapper">
+      <input id="loginSenha" type="password" placeholder="Digite sua senha">
+      <button type="button" class="btn-ver-senha" aria-label="Mostrar senha" aria-pressed="false" onclick="alternarVisibilidadeSenha('loginSenha', this)">◎</button>
+    </div>
 
     <button onclick="entrar()">Entrar</button>
 
@@ -60,10 +68,16 @@
     <input id="cadConfirmaEmail" type="email" placeholder="Confirme seu email">
 
     <label>Senha</label>
-    <input id="cadSenha" type="password" placeholder="Digite sua senha">
+    <div class="campo-senha-wrapper">
+      <input id="cadSenha" type="password" placeholder="Digite sua senha">
+      <button type="button" class="btn-ver-senha" aria-label="Mostrar senha" aria-pressed="false" onclick="alternarVisibilidadeSenha('cadSenha', this)">◎</button>
+    </div>
 
     <label>Confirmar senha</label>
-    <input id="cadConfirmaSenha" type="password" placeholder="Confirme sua senha">
+    <div class="campo-senha-wrapper">
+      <input id="cadConfirmaSenha" type="password" placeholder="Confirme sua senha">
+      <button type="button" class="btn-ver-senha" aria-label="Mostrar senha" aria-pressed="false" onclick="alternarVisibilidadeSenha('cadConfirmaSenha', this)">◎</button>
+    </div>
 
     <button onclick="cadastrar()">Cadastrar</button>
 
@@ -82,10 +96,16 @@
     <input id="recEmail" type="email" autocomplete="email" placeholder="Digite seu e-mail">
 
     <label for="recSenha">Nova senha</label>
-    <input id="recSenha" type="password" autocomplete="new-password" maxlength="128" placeholder="Mínimo de 8 caracteres">
+    <div class="campo-senha-wrapper">
+      <input id="recSenha" type="password" autocomplete="new-password" maxlength="128" placeholder="Mínimo de 8 caracteres">
+      <button type="button" class="btn-ver-senha" aria-label="Mostrar senha" aria-pressed="false" onclick="alternarVisibilidadeSenha('recSenha', this)">◎</button>
+    </div>
 
     <label for="recConfirmaSenha">Confirmar nova senha</label>
-    <input id="recConfirmaSenha" type="password" autocomplete="new-password" maxlength="128" placeholder="Confirme a nova senha">
+    <div class="campo-senha-wrapper">
+      <input id="recConfirmaSenha" type="password" autocomplete="new-password" maxlength="128" placeholder="Confirme a nova senha">
+      <button type="button" class="btn-ver-senha" aria-label="Mostrar senha" aria-pressed="false" onclick="alternarVisibilidadeSenha('recConfirmaSenha', this)">◎</button>
+    </div>
 
     <button type="button" onclick="trocarSenha()">Alterar senha</button>
 
@@ -449,14 +469,20 @@
   <div class="config-card">
 
     <label>Nova senha</label>
-    <input id="senhaConfig"
-           type="password"
-           placeholder="Digite a nova senha">
+    <div class="campo-senha-wrapper">
+      <input id="senhaConfig"
+             type="password"
+             placeholder="Digite a nova senha">
+      <button type="button" class="btn-ver-senha" aria-label="Mostrar senha" aria-pressed="false" onclick="alternarVisibilidadeSenha('senhaConfig', this)">◎</button>
+    </div>
 
     <label>Confirmar senha</label>
-    <input id="confirmaSenhaConfig"
-           type="password"
-           placeholder="Confirme a senha">
+    <div class="campo-senha-wrapper">
+      <input id="confirmaSenhaConfig"
+             type="password"
+             placeholder="Confirme a senha">
+      <button type="button" class="btn-ver-senha" aria-label="Mostrar senha" aria-pressed="false" onclick="alternarVisibilidadeSenha('confirmaSenhaConfig', this)">◎</button>
+    </div>
 
     <label>Email de recuperação</label>
     <input id="emailRecConfig"
@@ -483,7 +509,20 @@
 </section>
 
 
-    <!-- ÁREA ADMINISTRATIVA: exibida somente para usuários com perfil Administrador -->
+    <!-- ÁREA ADMINISTRATIVA: -->
+    <section id="adminAlunoDetalhes" class="tela">
+      <button class="btn-voltar" onclick="mostrarTela('adminAlunos')">← Voltar para administração</button>
+      <h1 class="page-title">Progresso do aluno</h1>
+      <p class="page-subtitle" id="adminDetalhesSubtitulo">Consulte os exercícios realizados e as notas.</p>
+      <p id="adminDetalhesMsg" class="mensagem" aria-live="polite"></p>
+      <div class="admin-tabela-container">
+        <table class="admin-tabela">
+          <thead><tr><th>Exercício</th><th>Nota</th><th>Acertos</th><th>Erros</th><th>Data da atividade</th></tr></thead>
+          <tbody id="adminProgressoTbody"><tr><td colspan="5">Selecione um aluno na administração.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
     <section id="adminAlunos" class="tela">
       <button class="btn-voltar" onclick="mostrarTela('inicio')">← Voltar</button>
       <h1 class="page-title">Administração</h1>
@@ -514,7 +553,7 @@
 
   </main>
 </div>
-<script src="script.js?v=34"></script>
+<script src="script.js?v=36"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
