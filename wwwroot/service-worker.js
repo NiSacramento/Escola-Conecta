@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'escola-conecta-shell-v2';
+const CACHE_NAME = 'escola-conecta-shell-v3';
 
 const APP_SHELL = [
   './',
@@ -55,6 +55,11 @@ self.addEventListener('fetch', event => {
 
   // Não armazenar respostas da API nem de outros domínios.
   if (url.origin !== self.location.origin) return;
+
+  if (request.mode === 'navigate') {
+    event.respondWith(fetch(request).catch(() => caches.match('./index.html')));
+    return;
+  }
 
   event.respondWith(
     caches.match(request)

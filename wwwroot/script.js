@@ -931,12 +931,13 @@ function atualizarLetra() {
 
   document.getElementById("debugIA").innerText = "Detectando...";
 
+  // Caracteres simples para evitar símbolos corrompidos em alguns celulares.
   document.getElementById("progressoLetras").innerText =
     letras.map((letra, i) => {
-      if (i < index) return "✔ " + letra;
-      if (i === index) return "👉 " + letra;
+      if (i < index) return "[OK] " + letra;
+      if (i === index) return "[>] " + letra;
       return letra;
-    }).join("  •  ");
+    }).join(" - ");
 }
 
 function finalizarExercicio() {
