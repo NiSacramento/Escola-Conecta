@@ -3,8 +3,8 @@
   Baseado na estrutura verificada em dbo.Alunos e dbo.Progresso.
 
   Seguro para reexecução: não exclui tabelas nem dados.
-  Ajusta a procedure de progresso para atualizar o registro existente
-  do mesmo aluno/exercício; caso não exista, insere um novo registro.
+  A procedure de progresso registra cada tentativa como uma nova linha,
+  preservando o histórico completo do aluno.
 */
 USE [PIM_Libras];
 GO
@@ -92,7 +92,7 @@ BEGIN
 END;
 GO
 
-/* 3. Procedure: atualiza o progresso do mesmo aluno/exercício; insere se novo. */
+/* 3. Procedure: registra cada tentativa como um novo progresso. */
 CREATE OR ALTER PROCEDURE dbo.usp_SalvarProgresso
     @AlunoEmail VARCHAR(150),
     @Exercicio VARCHAR(100),
@@ -109,7 +109,8 @@ BEGIN
         ;THROW 51001, 'O nome do exercício é obrigatório.', 1;
     END;
 
-    IF @Porcentagem < 0 OR @Porcentagem > 100 OR @Acertos < 0 OR @Erros < 0
+    IF @Porcentagem < 0 OR @Porcentagem > 100
+       OR @Acertos < 0 OR @Erros < 0
     BEGIN
         ;THROW 51002, 'Os valores de progresso são inválidos.', 1;
     END;
@@ -118,39 +119,22 @@ BEGIN
 
     SELECT TOP (1) @EmailCadastrado = Email
     FROM dbo.Alunos
-    WHERE LOWER(LTRIM(RTRIM(Email))) = LOWER(LTRIM(RTRIM(@AlunoEmail)));
+    WHERE LOWER(LTRIM(RTRIM(Email))) =
+          LOWER(LTRIM(RTRIM(@AlunoEmail)));
 
     IF @EmailCadastrado IS NULL
     BEGIN
-        ;THROW 51003, 'O e-mail não corresponde a um aluno cadastrado.', 1;
+        ;THROW 51003,
+            'O e-mail não corresponde a um aluno cadastrado.', 1;
     END;
 
-    BEGIN TRY
-        BEGIN TRANSACTION;
+    INSERT INTO dbo.Progresso
+        (AlunoEmail, Exercicio, Porcentagem, Acertos, Erros, DataRegistro)
+    VALUES
+        (@EmailCadastrado, LTRIM(RTRIM(@Exercicio)),
+         @Porcentagem, @Acertos, @Erros, GETDATE());
 
-        UPDATE dbo.Progresso
-        SET Porcentagem = @Porcentagem,
-            Acertos = @Acertos,
-            Erros = @Erros,
-            DataRegistro = GETDATE()
-        WHERE LOWER(LTRIM(RTRIM(AlunoEmail))) = LOWER(LTRIM(RTRIM(@EmailCadastrado)))
-          AND LTRIM(RTRIM(Exercicio)) = LTRIM(RTRIM(@Exercicio));
-
-        IF @@ROWCOUNT = 0
-        BEGIN
-            INSERT INTO dbo.Progresso
-                (AlunoEmail, Exercicio, Porcentagem, Acertos, Erros)
-            VALUES
-                (@EmailCadastrado, LTRIM(RTRIM(@Exercicio)), @Porcentagem, @Acertos, @Erros);
-        END;
-
-        COMMIT TRANSACTION;
-    END TRY
-    BEGIN CATCH
-        IF XACT_STATE() <> 0
-            ROLLBACK TRANSACTION;
-        THROW;
-    END CATCH;
+    SELECT CAST(SCOPE_IDENTITY() AS INT) AS Id;
 END;
 GO
 
