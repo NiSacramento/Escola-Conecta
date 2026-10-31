@@ -90,6 +90,21 @@ var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+// Respostas das rotas da aplicação/API não devem ser armazenadas pelo navegador.
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        context.Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
+        context.Response.Headers.Pragma = "no-cache";
+        context.Response.Headers.Expires = "0";
+        return Task.CompletedTask;
+    });
+
+    await next();
+});
+
 app.UseCors("PermitirFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
